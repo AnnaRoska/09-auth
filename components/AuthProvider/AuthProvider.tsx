@@ -12,7 +12,7 @@ interface Props {
 export default function AuthProvider({ children }: Props) {
   const router = useRouter();
   const pathname = usePathname();
-  const { user, setUser, clearIsAuthenticated } = useAuthStore();
+  const { setUser, clearIsAuthenticated } = useAuthStore();
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -21,13 +21,13 @@ export default function AuthProvider({ children }: Props) {
         const sessionUser = await checkSession();
         if (sessionUser) {
           setUser(sessionUser);
-        } else if (!user) {
+        } else {
           clearIsAuthenticated();
           if (pathname.startsWith("/profile")) {
             router.push("/sign-in");
           }
         }
-      } catch {
+      } catch (err) {
         clearIsAuthenticated();
       } finally {
         setLoading(false);
@@ -35,7 +35,8 @@ export default function AuthProvider({ children }: Props) {
     }
 
     verify();
-  }, [pathname, setUser, clearIsAuthenticated, user, router]);
+  
+  }, [pathname, setUser, clearIsAuthenticated, router]);
 
   if (loading) {
     return <p style={{ padding: 20 }}>Checking authorization...</p>;
