@@ -4,14 +4,8 @@ import Image from "next/image";
 import css from "./ProfilePage.module.css";
 import { useAuthStore } from "../../../lib/store/authStore";
 import Link from "next/link";
-/* import type { Metadata } from "next";
 
-export const metadata: Metadata = {
-  title: "Profile | NoteHub",
-  description: "User profile page of NoteHub application",
-}; */
-
-const Profile = () => {
+export default function Profile() {
   const { user } = useAuthStore();
 
   if (!user) {
@@ -30,11 +24,7 @@ const Profile = () => {
 
         <div className={css.avatarWrapper}>
           <Image
-            //src="https://ac.goit.global/avatar-placeholder.png"
-            src={
-              user.avatar ||
-              "https://ac.goit.global/fullstack/react/notehub-og-meta.jpg"
-            }
+            src={user.avatar || "https://ac.goit.global/fullstack/react/notehub-og-meta.jpg"}
             alt="User Avatar"
             width={120}
             height={120}
@@ -49,6 +39,4 @@ const Profile = () => {
       </div>
     </main>
   );
-};
-
-export default Profile;
+}

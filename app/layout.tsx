@@ -1,3 +1,4 @@
+import AuthProvider from "../components/AuthProvider/AuthProvider";
 
 import Header from "../components/Header/Header";
 import Footer from "../components/Footer/Footer";
@@ -8,18 +9,20 @@ import type { Metadata } from "next";
 import { Roboto } from "next/font/google";
 
 const roboto = Roboto({
-  weight: ["400", "500", "700"],   
-  subsets: ["latin"],             
-  display: "swap",                
-  variable: "--font-roboto",      
+  weight: ["400", "500", "700"],
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-roboto",
 });
 
 export const metadata: Metadata = {
   title: "NoteHub – Your Notes Online",
-  description: "NoteHub is a convenient app for creating, organizing and managing personal notes.",
+  description:
+    "NoteHub is a convenient app for creating, organizing and managing personal notes.",
   openGraph: {
     title: "NoteHub – Your Notes Online",
-    description: "NoteHub is a convenient app for creating, organizing and managing personal notes.",
+    description:
+      "NoteHub is a convenient app for creating, organizing and managing personal notes.",
     url: "https://your-domain.com",
     images: [
       {
@@ -42,10 +45,12 @@ export default function RootLayout({
     <html lang="en">
       <body className={roboto.variable}>
         <TanStackProvider>
-          <Header />
-          {children}
-          {modal}
-          <Footer />
+          <AuthProvider>
+            <Header />
+            {children}
+            {modal}
+            <Footer />
+          </AuthProvider>
         </TanStackProvider>
       </body>
     </html>

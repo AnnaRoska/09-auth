@@ -1,6 +1,9 @@
+
 import type { Note } from "../../types/note";
 import type { User } from "../../types/user";
 import { api } from "./api";
+
+
 
 export interface FetchNotesParams {
   page?: number;
@@ -60,7 +63,12 @@ export const register = async (data: AuthParams): Promise<User> => {
 
 export const login = async (data: AuthParams): Promise<User> => {
   const response = await api.post("/auth/login", data);
-  return response.data;
+
+  const { token, user } = response.data;
+
+  document.cookie = `token=${token}; Path=/;`;
+
+  return user;
 };
 
 export const logout = async (): Promise<void> => {

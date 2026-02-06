@@ -2,9 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
-
-import { checkSession } from "../../lib/api/clientApi";
 import { useAuthStore } from "../../lib/store/authStore";
+import { checkSession } from "../../lib/api/clientApi";
 
 interface Props {
   children: React.ReactNode;
@@ -13,21 +12,17 @@ interface Props {
 export default function AuthProvider({ children }: Props) {
   const router = useRouter();
   const pathname = usePathname();
-
-  const { setUser, clearIsAuthenticated } = useAuthStore();
-
+  const { user, setUser, clearIsAuthenticated } = useAuthStore();
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function verify() {
       try {
-        const user = await checkSession();
-
-        if (user) {
-          setUser(user);
-        } else {
+        const sessionUser = await checkSession();
+        if (sessionUser) {
+          setUser(sessionUser);
+        } else if (!user) {
           clearIsAuthenticated();
-
           if (pathname.startsWith("/profile")) {
             router.push("/sign-in");
           }
@@ -40,7 +35,7 @@ export default function AuthProvider({ children }: Props) {
     }
 
     verify();
-  },[pathname, setUser, clearIsAuthenticated, router]);
+  }, [pathname, setUser, clearIsAuthenticated, user, router]);
 
   if (loading) {
     return <p style={{ padding: 20 }}>Checking authorization...</p>;

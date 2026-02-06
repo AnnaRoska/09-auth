@@ -24,23 +24,21 @@ export default function SignIn() {
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
 
-    try {
-      await login({ email, password });
-
-      const user = await getMe();
-
-      const { setUser } = useAuthStore.getState();
-      setUser(user);
-
-      router.push("/profile");
-    } catch (err) {
+   try {
+    const user = await login({ email, password }); 
+    useAuthStore.getState().setUser(user);
+    router.push("/profile"); 
+  } 
+    
+    catch (err) {
       const errorMessage =
         err instanceof Error && "response" in err
           ? (err.response as { data?: { message?: string } })?.data?.message ||
             "Login failed. Check your credentials."
           : "Login failed. Check your credentials.";
       setError(errorMessage);
-    } finally {
+    } 
+    finally {
       setLoading(false);
     }
   }

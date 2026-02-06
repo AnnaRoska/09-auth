@@ -19,34 +19,34 @@ export default function EditProfile() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    async function load() {
-      try {
-        const me = await getMe();
-        setUsername(me.username);
-        setEmail(me.email);
-      } catch {
-        setError("Failed to load user data");
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    load();
-  }, []);
-
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-
+  async function load() {
     try {
-      const updated = await updateMe({ username, email });
+      const me = await getMe();
 
-      setUser(updated);
-
-      router.push("/profile");
+      setUser(me);        // 👈 додати це
+      setUsername(me.username);
+      setEmail(me.email);
     } catch {
-      setError("Failed to update profile");
+      setError("Failed to load user data");
+    } finally {
+      setLoading(false);
     }
   }
+
+  load();
+}, [setUser]);
+
+async function handleSubmit(e: React.FormEvent) {
+  e.preventDefault();
+  try {
+    await updateMe({ username, email });
+    const freshUser = await getMe(); // отримуємо актуальні дані
+    setUser(freshUser); // кладемо в Zustand
+    router.push("/profile");
+  } catch {
+    setError("Failed to update profile");
+  }
+}
 
   if (loading) {
     return <p>Loading...</p>;

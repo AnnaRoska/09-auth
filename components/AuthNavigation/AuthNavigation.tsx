@@ -11,21 +11,19 @@ import { useAuthStore } from "../../lib/store/authStore";
 export default function AuthNavigation() {
   const router = useRouter();
 
-  const { isAuthenticated, user, clearIsAuthenticated } = useAuthStore();
-
-  const handleLogout = async () => {
+    const { user, clearIsAuthenticated } = useAuthStore();
+    const handleLogout = async () => {
     try {
       await logout();
-
+      document.cookie = "token=; Path=/; Max-Age=0;";
       clearIsAuthenticated();
-
       router.push("/sign-in");
     } catch (error) {
       console.error("Logout failed", error);
     }
   };
 
-  if (!isAuthenticated) {
+    if (!user) {
     return (
       <>
         <li className={css.navigationItem}>
@@ -42,7 +40,6 @@ export default function AuthNavigation() {
       </>
     );
   }
-
   return (
     <>
       <li className={css.navigationItem}>
