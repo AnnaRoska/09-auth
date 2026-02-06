@@ -1,5 +1,5 @@
 
-import { Note } from "@/types/note";
+import { Note } from "../../types/note";
 
 type Props = {
   item: Note;
