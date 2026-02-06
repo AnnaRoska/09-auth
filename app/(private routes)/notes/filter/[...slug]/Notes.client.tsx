@@ -5,12 +5,12 @@ import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import { useDebounce } from "use-debounce";
 import Link from "next/link";
 
-import { fetchNotes } from "../../../../lib/api/clientApi";
-import type { Note } from "../../../../types/note";
+import { fetchNotes } from "../../../../../lib/api/clientApi";
+import type { Note } from "../../../../../types/note";
 
-import NoteList from "../../../../components/NoteList/NoteList";
-import Pagination from "../../../../components/Pagination/Pagination";
-import SearchBox from "../../../../components/SearchBox/SearchBox";
+import NoteList from "../../../../../components/NoteList/NoteList";
+import Pagination from "../../../../../components/Pagination/Pagination";
+import SearchBox from "../../../../../components/SearchBox/SearchBox";
 
 import css from "../../NotesPage.module.css";
 

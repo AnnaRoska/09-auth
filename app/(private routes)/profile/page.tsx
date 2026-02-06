@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import css from "./ProfilePage.module.css";
-import { useAuthStore } from "../../lib/store/authStore";
+import { useAuthStore } from "../../../lib/store/authStore";
 import Link from "next/link";
 /* import type { Metadata } from "next";
 
