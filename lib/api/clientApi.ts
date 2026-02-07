@@ -1,9 +1,6 @@
-
 import type { Note } from "../../types/note";
 import type { User } from "../../types/user";
 import { api } from "./api";
-
-
 
 export interface FetchNotesParams {
   page?: number;
@@ -64,11 +61,7 @@ export const register = async (data: AuthParams): Promise<User> => {
 export const login = async (data: AuthParams): Promise<User> => {
   const response = await api.post("/auth/login", data);
 
-  const { token, user } = response.data;
-
-  document.cookie = `token=${token}; Path=/;`;
-
-  return user;
+  return response.data.user;
 };
 
 export const logout = async (): Promise<void> => {
@@ -89,7 +82,11 @@ export const getMe = async (): Promise<User> => {
   return response.data;
 };
 
-export const updateMe = async (data: Partial<User>): Promise<User> => {
+export interface UpdateMeParams {
+  username: string;
+}
+
+export const updateMe = async (data: UpdateMeParams): Promise<User> => {
   const response = await api.patch("/users/me", data);
   return response.data;
 };

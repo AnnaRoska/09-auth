@@ -10,9 +10,7 @@ import { useAuthStore } from "../../../../lib/store/authStore";
 
 export default function EditProfile() {
   const router = useRouter();
-
   const { user, setUser } = useAuthStore();
-
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(true);
@@ -23,10 +21,12 @@ export default function EditProfile() {
     try {
       const me = await getMe();
 
-      setUser(me);        // 👈 додати це
-      setUsername(me.username);
+      setUser(me);       
       setEmail(me.email);
-    } catch {
+      setUsername(me.username);
+
+    } catch (err) {
+      console.error("Error loading user:", err);
       setError("Failed to load user data");
     } finally {
       setLoading(false);
@@ -39,9 +39,9 @@ export default function EditProfile() {
 async function handleSubmit(e: React.FormEvent) {
   e.preventDefault();
   try {
-    await updateMe({ username, email });
-    const freshUser = await getMe(); // отримуємо актуальні дані
-    setUser(freshUser); // кладемо в Zustand
+    await updateMe({ username});
+    const freshUser = await getMe(); 
+    setUser(freshUser); 
     router.push("/profile");
   } catch {
     setError("Failed to update profile");
@@ -58,7 +58,6 @@ async function handleSubmit(e: React.FormEvent) {
         <h1 className={css.formTitle}>Edit Profile</h1>
 
         <Image
-          //src={user?.avatar || "/default-avatar.png"}
           src={user?.avatar || "https://ac.goit.global/fullstack/react/notehub-og-meta.jpg"}
           alt="User Avatar"
           width={120}
@@ -78,11 +77,8 @@ async function handleSubmit(e: React.FormEvent) {
               onChange={(e) => setUsername(e.target.value)}
             />
           </div>
-
           <p>Email: {email}</p>
           
-          {/* <p>Email: {user?.email}</p> */}
-          {/* <p>Email: user_email@example.com</p> */}
 
           {error && <p className={css.error}>{error}</p>}
 

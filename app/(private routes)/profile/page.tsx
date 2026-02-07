@@ -1,15 +1,24 @@
-"use client";
-
 import Image from "next/image";
-import css from "./ProfilePage.module.css";
-import { useAuthStore } from "../../../lib/store/authStore";
 import Link from "next/link";
+import css from "./ProfilePage.module.css";
 
-export default function Profile() {
-  const { user } = useAuthStore();
+import { getMe } from "../../../lib/api/serverApi";
+import { cookies } from "next/headers";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Profile",
+  description: "User profile page",
+};
+
+export default async function ProfilePage() {
+  const cookieStore = await cookies();
+  const cookieHeader = cookieStore.toString();
+
+  const user = await getMe(cookieHeader);
 
   if (!user) {
-    return <p>Loading...</p>;
+    return <p>Not authorized</p>;
   }
 
   return (
@@ -17,6 +26,7 @@ export default function Profile() {
       <div className={css.profileCard}>
         <div className={css.header}>
           <h1 className={css.formTitle}>Profile Page</h1>
+
           <Link href="/profile/edit" className={css.editProfileButton}>
             Edit Profile
           </Link>
@@ -24,7 +34,10 @@ export default function Profile() {
 
         <div className={css.avatarWrapper}>
           <Image
-            src={user.avatar || "https://ac.goit.global/fullstack/react/notehub-og-meta.jpg"}
+            src={
+              user.avatar ||
+              "https://ac.goit.global/fullstack/react/notehub-og-meta.jpg"
+            }
             alt="User Avatar"
             width={120}
             height={120}

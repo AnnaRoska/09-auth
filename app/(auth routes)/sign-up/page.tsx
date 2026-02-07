@@ -24,9 +24,9 @@ export default function SignUp() {
 
     try {
       await register({ email, password });
-      await login({ email, password }); // токен в cookie
+      await login({ email, password }); 
       const me = await getMe();
-      setUser(me); // кладемо в Zustand
+      setUser(me);
       router.push("/profile");
     } catch (err: unknown) {
       const error = err as AxiosError;

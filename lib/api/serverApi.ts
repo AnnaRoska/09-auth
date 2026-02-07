@@ -1,57 +1,94 @@
 import type { Note } from "../../types/note";
 import type { User } from "../../types/user";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL + "/api";
+import { cookies } from "next/headers";
+import { api } from "./api";
 
-export const fetchNotes = async (
-  params: { page?: number; perPage?: number; search?: string; tag?: string },
-  cookie?: string
-) => {
-  const query = new URLSearchParams({
-    page: String(params.page || 1),
-    perPage: String(params.perPage || 12),
-    search: params.search || "",
-    ...(params.tag ? { tag: params.tag } : {}),
+async function getCookieHeader(): Promise<string> {
+  const cookieStore = await cookies();
+  const all = cookieStore.getAll();
+
+  return all.map((c) => `${c.name}=${c.value}`).join("; ");
+}
+
+export interface FetchNotesParams {
+  page?: number;
+  perPage?: number;
+  search?: string;
+  tag?: string;
+}
+
+export const fetchNotes = async (params: FetchNotesParams) => {
+  const cookie = await getCookieHeader();
+
+  const response = await api.get("/notes", {
+    params: {
+      page: params.page || 1,
+      perPage: params.perPage || 12,
+      search: params.search || "",
+      ...(params.tag ? { tag: params.tag } : {}),
+    },
+    headers: {
+      Cookie: cookie,
+    },
   });
 
-  const res = await fetch(`${API_URL}/notes?${query.toString()}`, {
-    headers: cookie ? { Cookie: cookie } : {},
-    cache: "no-store",
-  });
-
-  return res.json();
+  return response.data;
 };
 
-export const fetchNoteById = async (
-  id: string,
-  cookie?: string
-): Promise<Note> => {
-  const res = await fetch(`${API_URL}/notes/${id}`, {
-    headers: cookie ? { Cookie: cookie } : {},
-    cache: "no-store",
+export const fetchNoteById = async (id: string): Promise<Note> => {
+  const cookie = await getCookieHeader();
+
+  const response = await api.get(`/notes/${id}`, {
+    headers: {
+      Cookie: cookie,
+    },
   });
 
-  return res.json();
+  return response.data;
 };
 
-export const getMe = async (cookie?: string): Promise<User | null> => {
-  const res = await fetch(`${API_URL}/users/me`, {
-    headers: cookie ? { Cookie: cookie } : {},
-    cache: "no-store",
-  });
+export const getMe = async (cookieArg?: string): Promise<User | null> => {
+  const cookie = cookieArg ?? await getCookieHeader();
 
-  if (!res.ok) return null;
+  try {
+    const response = await api.get("/users/me", {
+      headers: {
+        Cookie: cookie,
+      },
+    });
 
-  return res.json();
+    return response.data;
+  } catch {
+    return null;
+  }
 };
 
-export const checkSession = async (cookie?: string): Promise<User | null> => {
-  const res = await fetch(`${API_URL}/auth/session`, {
-    headers: cookie ? { Cookie: cookie } : {},
-    cache: "no-store",
-  });
+export interface SessionResponse {
+  user: User;
+  accessToken: string;
+  refreshToken: string;
+}
 
-  if (!res.ok) return null;
+export const checkSession = async (): Promise<SessionResponse> => {
+  const cookie = await getCookieHeader();
 
-  return res.json();
+  const cookieStore = await cookies();
+  const refreshToken = cookieStore.get("refreshToken")?.value;
+
+  if (!refreshToken) {
+    throw new Error("No refresh token available");
+  }
+
+  const response = await api.post(
+    "/auth/session",
+    { refreshToken },
+    {
+      headers: {
+        Cookie: cookie,
+      },
+    },
+  );
+
+  return response.data;
 };
