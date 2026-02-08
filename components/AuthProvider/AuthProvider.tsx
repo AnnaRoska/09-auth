@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuthStore } from "../../lib/store/authStore";
-import { checkSession, getMe } from "../../lib/api/clientApi";
+import { checkSession } from "../../lib/api/clientApi";
 
 interface Props {
   children: React.ReactNode;
@@ -19,12 +19,13 @@ export default function AuthProvider({ children }: Props) {
   useEffect(() => {
     async function verify() {
       try {
-        const session = await checkSession();
-
+        /* const session = await checkSession();
         if (session) {
           const user = await getMe();
-
-          setUser(user);
+          setUser(user); */
+        const sessionUser = await checkSession();
+        if (sessionUser) {
+          setUser(sessionUser);
         } else {
           clearIsAuthenticated();
 

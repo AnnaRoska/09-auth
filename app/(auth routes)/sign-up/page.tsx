@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import css from "./SignUpPage.module.css";
-import { register, login, getMe } from "../../../lib/api/clientApi";
+import { register, login } from "../../../lib/api/clientApi";
 import { useAuthStore } from "../../../lib/store/authStore";
 import type { AxiosError } from "axios";
 
@@ -24,8 +24,11 @@ export default function SignUp() {
 
     try {
       await register({ email, password });
-      await login({ email, password }); 
-      const me = await getMe();
+
+      const me = await login({ email, password });
+
+      //await login({ email, password }); 
+      //const me = await getMe();
       setUser(me);
       router.push("/profile");
     } catch (err: unknown) {

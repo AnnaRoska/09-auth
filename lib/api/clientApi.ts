@@ -55,13 +55,16 @@ interface AuthParams {
 
 export const register = async (data: AuthParams): Promise<User> => {
   const response = await api.post("/auth/register", data);
+  //console.log("register response.data :", response.data)
+  //console.log("register response.data.user  :", response.data.user)
   return response.data;
 };
 
 export const login = async (data: AuthParams): Promise<User> => {
   const response = await api.post("/auth/login", data);
-
-  return response.data.user;
+  //console.log("login response.data :",response.data)
+  //console.log("login response.data.user  :",response.data.user.email)
+  return response.data;
 };
 
 export const logout = async (): Promise<void> => {

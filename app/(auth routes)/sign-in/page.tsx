@@ -4,8 +4,9 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import css from "./SignInPage.module.css";
 
-import { getMe, login } from "../../../lib/api/clientApi";
+import { login } from "../../../lib/api/clientApi";
 import { useAuthStore } from "../../../lib/store/authStore";
+import type { AxiosError } from "axios";
 
 export default function SignIn() {
   const router = useRouter();
@@ -20,26 +21,35 @@ export default function SignIn() {
     setLoading(true);
 
     const formData = new FormData(e.currentTarget);
-
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
 
-   try {
-    const user = await login({ email, password }); 
-    useAuthStore.getState().setUser(user);
-    router.push("/profile"); 
-  } 
-    
-    catch (err) {
+    try {
+      const user = await login({ email, password });
+      useAuthStore.getState().setUser(user);
+      router.push("/profile");
+    } catch (err: unknown) {
+      /* catch (err: unknown) {
       const errorMessage =
-        err instanceof Error && "response" in err
-          ? (err.response as { data?: { message?: string } })?.data?.message ||
-            "Login failed. Check your credentials."
+        err instanceof Error
+          ? err.message
           : "Login failed. Check your credentials.";
-      setError(errorMessage);
-    } 
-    finally {
+      setError((err as any)?.response?.data?.message || errorMessage);
+    } finally {
       setLoading(false);
+    } */
+      if (err && typeof err === "object" && "response" in err) {
+        const axiosError = err as AxiosError<{ message?: string }>;
+
+        setError(
+          axiosError.response?.data?.message ||
+            "Login failed. Check your credentials.",
+        );
+      } else if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("Login failed. Check your credentials.");
+      }
     }
   }
 

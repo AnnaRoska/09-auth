@@ -3,6 +3,7 @@ import type { User } from "../../types/user";
 
 import { cookies } from "next/headers";
 import { api } from "./api";
+import type { AxiosResponse } from "axios";
 
 async function getCookieHeader(): Promise<string> {
   const cookieStore = await cookies();
@@ -70,25 +71,15 @@ export interface SessionResponse {
   refreshToken: string;
 }
 
-export const checkSession = async (): Promise<SessionResponse> => {
+export const checkSession = async (): Promise<AxiosResponse<SessionResponse>> => {
   const cookie = await getCookieHeader();
 
-  const cookieStore = await cookies();
-  const refreshToken = cookieStore.get("refreshToken")?.value;
-
-  if (!refreshToken) {
-    throw new Error("No refresh token available");
-  }
-
-  const response = await api.post(
-    "/auth/session",
-    { refreshToken },
-    {
-      headers: {
-        Cookie: cookie,
-      },
+  const response = await api.get<SessionResponse>("/auth/session", {
+    headers: {
+      Cookie: cookie,
     },
-  );
+  });
 
-  return response.data;
+  return response;
 };
+
