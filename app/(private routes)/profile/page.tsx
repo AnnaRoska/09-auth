@@ -3,8 +3,10 @@ import Link from "next/link";
 import css from "./ProfilePage.module.css";
 
 import { getMe } from "../../../lib/api/serverApi";
-import { cookies } from "next/headers";
+//import { cookies } from "next/headers";
 import type { Metadata } from "next";
+
+
 
 export const metadata: Metadata = {
   title: "Profile",
@@ -12,10 +14,11 @@ export const metadata: Metadata = {
 };
 
 export default async function ProfilePage() {
-  const cookieStore = await cookies();
-  const cookieHeader = cookieStore.toString();
+  //const cookieStore = await cookies();
+  //const cookieHeader = cookieStore.toString();
+  const user = await getMe();
 
-  const user = await getMe(cookieHeader);
+  
 
   if (!user) {
     return <p>Not authorized</p>;
@@ -35,7 +38,7 @@ export default async function ProfilePage() {
         <div className={css.avatarWrapper}>
           <Image
             src={
-              user.avatar ||
+              user.data.avatar ||
               "https://ac.goit.global/fullstack/react/notehub-og-meta.jpg"
             }
             alt="User Avatar"
@@ -46,8 +49,8 @@ export default async function ProfilePage() {
         </div>
 
         <div className={css.profileInfo}>
-          <p>Username: {user.username}</p>
-          <p>Email: {user.email}</p>
+          <p>Username: {user.data.username}</p>
+          <p>Email: {user.data.email}</p>
         </div>
       </div>
     </main>

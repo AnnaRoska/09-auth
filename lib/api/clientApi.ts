@@ -60,11 +60,15 @@ export const register = async (data: AuthParams): Promise<User> => {
   return response.data;
 };
 
+
+
 export const login = async (data: AuthParams): Promise<User> => {
-  const response = await api.post("/auth/login", data);
-  //console.log("login response.data :",response.data)
-  //console.log("login response.data.user  :",response.data.user.email)
-  return response.data;
+  try {
+    const response = await api.post("/auth/login", data);
+    return response.data;
+  } catch (err: unknown) {
+    throw err; 
+  }
 };
 
 export const logout = async (): Promise<void> => {

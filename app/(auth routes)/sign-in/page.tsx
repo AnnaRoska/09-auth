@@ -3,20 +3,17 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import css from "./SignInPage.module.css";
-
-import { login } from "../../../lib/api/clientApi";
+import { login, getMe } from "../../../lib/api/clientApi";
 import { useAuthStore } from "../../../lib/store/authStore";
-import type { AxiosError } from "axios";
-
+import { AxiosError } from "axios";
 export default function SignIn() {
   const router = useRouter();
-
+  const { setUser } = useAuthStore();
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-
     setError("");
     setLoading(true);
 
@@ -25,31 +22,22 @@ export default function SignIn() {
     const password = formData.get("password") as string;
 
     try {
-      const user = await login({ email, password });
-      useAuthStore.getState().setUser(user);
+      await login({ email, password });
+      const me = await getMe();
+      setUser(me);
       router.push("/profile");
     } catch (err: unknown) {
-      /* catch (err: unknown) {
-      const errorMessage =
-        err instanceof Error
-          ? err.message
-          : "Login failed. Check your credentials.";
-      setError((err as any)?.response?.data?.message || errorMessage);
+      let message = "Login failed. Check your credentials.";
+
+      if (err instanceof AxiosError) {
+        message = err.response?.data?.message ?? message;
+      } else if (err instanceof Error) {
+        message = err.message;
+      }
+
+      setError(message);
     } finally {
       setLoading(false);
-    } */
-      if (err && typeof err === "object" && "response" in err) {
-        const axiosError = err as AxiosError<{ message?: string }>;
-
-        setError(
-          axiosError.response?.data?.message ||
-            "Login failed. Check your credentials.",
-        );
-      } else if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError("Login failed. Check your credentials.");
-      }
     }
   }
 
@@ -57,7 +45,6 @@ export default function SignIn() {
     <main className={css.mainContent}>
       <form className={css.form} onSubmit={handleSubmit}>
         <h1 className={css.formTitle}>Sign in</h1>
-
         <div className={css.formGroup}>
           <label htmlFor="email">Email</label>
           <input
@@ -68,7 +55,6 @@ export default function SignIn() {
             required
           />
         </div>
-
         <div className={css.formGroup}>
           <label htmlFor="password">Password</label>
           <input
@@ -79,13 +65,11 @@ export default function SignIn() {
             required
           />
         </div>
-
         <div className={css.actions}>
           <button type="submit" className={css.submitButton} disabled={loading}>
             {loading ? "Logging in..." : "Log in"}
           </button>
         </div>
-
         {error && <p className={css.error}>{error}</p>}
       </form>
     </main>
