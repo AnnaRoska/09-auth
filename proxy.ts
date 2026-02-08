@@ -19,25 +19,25 @@ export default async function proxy(request: NextRequest) {
     "accessToken:",
     !!accessToken,
     "refreshToken:",
-    !!refreshToken
+    !!refreshToken,
   );
 
   if (!accessToken && refreshToken) {
     try {
       const session = await checkSession();
 
-      if (session?.accessToken) {
-        accessToken = session.accessToken;
+      if (session?.data?.accessToken) {
+        accessToken = session.data.accessToken;
 
         const response = NextResponse.next();
 
-        response.cookies.set("accessToken", session.accessToken, {
+        response.cookies.set("accessToken", session.data.accessToken, {
           httpOnly: true,
           path: "/",
         });
 
-        if (session.refreshToken) {
-          response.cookies.set("refreshToken", session.refreshToken, {
+        if (session.data.refreshToken) {
+          response.cookies.set("refreshToken", session.data.refreshToken, {
             httpOnly: true,
             path: "/",
           });
@@ -57,10 +57,7 @@ export default async function proxy(request: NextRequest) {
     return NextResponse.redirect(new URL("/sign-in", request.url));
   }
 
-  if (
-    publicRoutes.some((route) => pathname.startsWith(route)) &&
-    accessToken
-  ) {
+  if (publicRoutes.some((route) => pathname.startsWith(route)) && accessToken) {
     return NextResponse.redirect(new URL("/", request.url));
   }
 
